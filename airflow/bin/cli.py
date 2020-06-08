@@ -71,6 +71,8 @@ from airflow.www_rbac.app import cached_appbuilder
 
 from sqlalchemy.orm import exc
 
+import guppy
+
 api.load_auth()
 api_module = import_module(conf.get('cli', 'api_client'))  # type: Any
 api_client = api_module.Client(api_base_url=conf.get('cli', 'endpoint_url'),
@@ -475,6 +477,9 @@ def _run(args, dag, ti):
 
 @cli_utils.action_logging
 def run(args, dag=None):
+    hp = guppy.hpy()
+    hp.setrelheap()
+
     if dag:
         args.dag_id = dag.dag_id
 
@@ -522,6 +527,11 @@ def run(args, dag=None):
         with redirect_stdout(ti.log, logging.INFO), redirect_stderr(ti.log, logging.WARN):
             _run(args, dag, ti)
     logging.shutdown()
+
+    h = hp.heap()
+    print('### dump ###')
+    h.dump(sys.stdout)
+    sys.std.flush()
 
 
 @cli_utils.action_logging
