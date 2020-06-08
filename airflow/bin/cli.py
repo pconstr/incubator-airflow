@@ -71,6 +71,7 @@ from airflow.www_rbac.app import cached_appbuilder
 
 from sqlalchemy.orm import exc
 
+from io import StringIO
 import guppy
 
 api.load_auth()
@@ -484,6 +485,8 @@ def run(args, dag=None):
         args.dag_id = dag.dag_id
 
     log = LoggingMixin().log
+    log.info('### run ###')
+    log.info(str(args))
 
     # Load custom airflow config
     if args.cfg_path:
@@ -529,10 +532,10 @@ def run(args, dag=None):
     logging.shutdown()
 
     h = hp.heap()
-    print('### dump ###')
-    h.dump(sys.stdout)
-    sys.std.flush()
-
+    log.info('### dump ###')
+    with StringIO() as f:
+        h.dump(f)
+        log.info(f.getvalue())
 
 @cli_utils.action_logging
 def task_failed_deps(args):
