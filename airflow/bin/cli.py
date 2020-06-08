@@ -535,7 +535,10 @@ def run(args, dag=None):
     log.info('### dump ###')
     with StringIO() as f:
         h.dump(f)
-        log.info(f.getvalue())
+        v = f.getvalue()
+        log.info(v)
+        print(v)
+        sys.flush()
 
 @cli_utils.action_logging
 def task_failed_deps(args):
